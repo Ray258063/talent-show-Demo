@@ -1,0 +1,28 @@
+2024-11-21 08:45:12 INFO  [SystemStartup] - 系統啟動中...
+2024-11-21 08:45:13 INFO  [DatabaseConnection] - 嘗試連線至資料庫 (jdbc:oracle:thin:@localhost:1521:ORCL)...
+2024-11-21 08:45:15 INFO  [DatabaseConnection] - 資料庫連線成功 (User: admin).
+2024-11-21 08:46:20 INFO  [UserLogin] - 使用者 admin 成功登入系統。
+2024-11-21 08:48:05 ERROR [FileUploadHandler] - 上傳檔案失敗。原因: 檔案大小超過限制 (10MB)。
+2024-11-21 08:48:05 DEBUG [FileUploadHandler] - 上傳的檔案名稱: report2024.pdf, 檔案大小: 15MB。
+2024-11-21 08:50:33 WARN  [MemoryMonitor] - 系統記憶體使用率高達 85%。建議釋放資源。
+2024-11-21 08:51:12 INFO  [ScheduledTask] - 開始執行每日資料備份。
+2024-11-21 08:51:35 INFO  [BackupService] - 資料備份完成，耗時 23 秒。
+2024-11-21 08:53:19 ERROR [DataProcessingJob] - 資料處理失敗，任務ID: JOB12345。原因: NullPointerException。
+2024-11-21 08:53:19 DEBUG [DataProcessingJob] - StackTrace: 
+    java.lang.NullPointerException: Cannot read property 'name' of null
+        at com.example.service.DataProcessor.process(DataProcessor.java:45)
+        at com.example.service.TaskScheduler.runTask(TaskScheduler.java:132)
+        ...
+2024-11-21 08:55:03 INFO  [UserAction] - 使用者 admin 查詢了報表數據，條件: 日期範圍 2024-11-01 至 2024-11-20。
+2024-11-21 09:00:15 INFO  [UserLogout] - 使用者 admin 登出系統。
+2024-11-21 09:01:05 INFO  [UserLogin] - 使用者 john 登入系統。
+2024-11-21 09:02:45 ERROR [ApiRequestHandler] - API 呼叫失敗，Endpoint: /api/v1/orders，錯誤碼: 500。
+2024-11-21 09:02:45 DEBUG [ApiRequestHandler] - 請求詳細資料: 
+    Method: GET
+    Headers: {Authorization: Bearer eyJhb...}
+    Params: {status=pending}
+    Response: {message: "Internal Server Error", errorCode: 500}
+2024-11-21 09:05:12 WARN  [DiskMonitor] - 磁碟空間不足，剩餘空間僅 5GB。
+2024-11-21 09:10:40 INFO  [SystemShutdown] - 系統正在關閉...
+2024-11-21 09:10:41 ERROR [ShutdownTask] - 系統無法停止服務 ServiceX。原因: TimeoutException。
+2024-11-21 09:10:50 INFO  [SystemShutdown] - 系統關閉完成。
