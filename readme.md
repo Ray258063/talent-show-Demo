@@ -1,3 +1,9 @@
+# 說明
+- 目前寫3個port 
+- 第一個是一問一答 需要將任務內容 輸入資料一起輸入給模型 不限log分析(預設是log分析 所以system prompt可不輸入) 可自由輸入系統提示詞和任務需求 裡面會將他們合起來
+- 第二個限制為log分析 同樣要把log資料和使用者提問一起輸入 有聊天歷史紀錄
+- 第三個有RAG 但資料目前開發中
+
 # Set Up
 ## 1. Install Dependency
 ```bash
@@ -62,6 +68,10 @@ curl -X 'POST' \
 {"analysis": "result"}
 ```
 
+```json
+{"analysis": "result", "history": []}
+```
+
 ## Errors
 ### Not Input Error
 - 400 Not input model name or require
@@ -72,13 +82,12 @@ POST
 import requests
 api_url = 'http://127.0.0.1:8000/openapi/v1/watsonxai/analysis_log'
 
-param = {"model_name":"meta-llama/llama-3-1-70b-instruct", "require_text": require_text}
+param = {"model_name":"meta-llama/llama-3-1-70b-instruct", "system_prompt":"", "require_text": require_text}
 
 response = requests.post(api_url, params=param)
 print(response)
 ```
 
 ### 備註
-- 用英文寫提示詞效果較好 改post裡的require_text(任務需求)
-  - 可另外寫系統提示詞 系統提示詞:通常為給模型角色卡，例如你是一位...專家，能做或擅長什麼
+- 用英文寫提示詞效果較好
 - API KEY需要申請 加在.env

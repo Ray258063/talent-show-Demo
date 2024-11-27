@@ -71,7 +71,6 @@ async def watsonx_generate(model_name:str = "", system_prompt:str = None, requir
 })
 @catch_error
 async def watsonai_chat(input_data:InputFormat):
-    print(input_data)
     model_name = input_data.model_name
     require_text = input_data.require_text
     history = input_data.history

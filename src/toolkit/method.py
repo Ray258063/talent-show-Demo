@@ -4,6 +4,8 @@ from langchain_core.prompts import PromptTemplate
 from ibm_watsonx_ai.foundation_models import ModelInference
 from langchain_ibm import WatsonxLLM
 
+import pickle
+
 def generate_text(model_name: str, system_prompt: str, require_text: str, model_config: object, env_config: object) -> str:
     if system_prompt == None:
         system_prompt = """Analyze the content from the input log information and detect error messages, resource overload and system anomalies.\n"""
@@ -30,7 +32,20 @@ def generate_text(model_name: str, system_prompt: str, require_text: str, model_
 
 def generate_chat(model_name: str, require_text: str, history: list, model_config: object, env_config: object) -> str:
     
-    system_prompt = """\n"""
+    system_prompt = """You are a professional network switch fault diagnosis expert and have extensive experience in analyzing network equipment problems. Your task is to carefully analyze switch logs (logs) and provide professional and accurate problem diagnosis and solution suggestions. During the analysis, follow these steps and "Analysis_principles":
+    
+    1. Carefully check the log content to identify key error messages
+    2. Conduct systemic problem analysis
+        - Determine the type of problem (hardware, software, settings, connections, etc.)
+        - Trace possible root causes
+    3. Provide specific diagnostic results
+    4. Give clear solutions or further diagnostic suggestions
+
+    <Analysis_principles>
+    - Remain objective and technically professional
+    - Prioritize the impact on network stability and security
+    - Provide implementable technical suggestions
+    </Analysis_principles>"""
     
     if len(history) == 0:
         message = [

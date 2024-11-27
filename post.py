@@ -18,7 +18,7 @@ response = requests.post(api_url, params = param, verify=False)
 print(response.json()['analysis'])
 print(time.time()-st)
 
-# 聊天
+# 聊天 直接輸入問題和log
 api_url = 'http://127.0.0.1:8000/openapi/v1/watsonaix/analysis_log_chat'
 require_text = "test chat"
 history = [{"test": "history"}]
