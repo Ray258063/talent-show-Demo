@@ -4,7 +4,7 @@ from asyncio import get_event_loop, Lock
 import asyncio
 from dotenv import load_dotenv
 from toolkit.method import *
-from toolkit.lib import (AnalyzeResponse, Errors, HTTPErrorResult, catch_error, healthcheck, env_config, model_config)
+from toolkit.lib import (AnalyzeResponse, ChatResponse, LogData, InputFormat, Errors, HTTPErrorResult, catch_error, healthcheck, env_config, model_config)
 import concurrent.futures
 
 from ibm_watsonx_ai import APIClient
@@ -12,7 +12,7 @@ from ibm_watsonx_ai import Credentials
 
 if __name__ == 'routers.classifier_v1':
     TAG_MODEL_VERSION = 'v1'
-    router = APIRouter(prefix='/v1/watsonai', tags=[TAG_MODEL_VERSION])
+    router = APIRouter(prefix='/v1/watsonaix', tags=[TAG_MODEL_VERSION])
     lock = Lock()
     EXECUTOR = concurrent.futures.ThreadPoolExecutor()
     
@@ -56,10 +56,47 @@ def readiness_probe(response: Response) -> healthcheck:
     500: {'model': HTTPErrorResult},
 })
 @catch_error
-async def watsonx_generate(model_name:str, system_prompt:str = None, require_text:str = None):
+async def watsonx_generate(model_name:str = "", system_prompt:str = None, require_text:str = None):
     if model_name == "" or require_text == None or require_text == "":
         return Errors.NO_INPUT_ERROR
     event_loop = get_event_loop()
     async with lock:
         analysis_result = await event_loop.run_in_executor(None, generate_text, model_name, system_prompt, require_text, model_config, env_config)
-        return AnalyzeResponse(analysis=analysis_result)
+    return AnalyzeResponse(analysis=analysis_result)
+
+@router.post('/analysis_log_chat', responses={
+    200: {'model': ChatResponse},
+    400: {'model': HTTPErrorResult},
+    500: {'model': HTTPErrorResult},
+})
+@catch_error
+async def watsonai_chat(input_data:InputFormat):
+    print(input_data)
+    model_name = input_data.model_name
+    require_text = input_data.require_text
+    history = input_data.history
+    
+    if model_name == "" or require_text == None or require_text == "":
+        return Errors.NO_INPUT_ERROR
+    event_loop = get_event_loop()
+    async with lock:
+        analysis_chat_result, history = await event_loop.run_in_executor(None, generate_chat, model_name, require_text, history, model_config, env_config)
+    return ChatResponse(analysis=analysis_chat_result, history=history)
+
+@router.post('/rag_log_chat', responses={
+    200: {'model': ChatResponse},
+    400: {'model': HTTPErrorResult},
+    500: {'model': HTTPErrorResult},
+})
+@catch_error
+async def watsonai_rag_chat(log_data:LogData, input_data:InputFormat):
+    model_name = input_data.model_name
+    require_text = input_data.require_text
+    history = input_data.history
+    
+    if model_name == "" or require_text == None or require_text == "":
+        return Errors.NO_INPUT_ERROR
+    event_loop = get_event_loop()
+    async with lock:
+        analysis_chat_result, history = await event_loop.run_in_executor(None, generate_rag_chat, log_data, model_name, require_text, history, model_config, env_config)
+    return ChatResponse(analysis=analysis_chat_result, history=history)

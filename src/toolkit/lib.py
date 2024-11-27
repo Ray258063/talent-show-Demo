@@ -33,6 +33,20 @@ class HTTPErrorResult(BaseModel):
 class AnalyzeResponse(BaseModel):
     analysis: str
 
+class ChatResponse(BaseModel):
+    analysis: str
+    history: list = []
+
+class InputFormat(BaseModel):
+    model_name: str = ""
+    require_text: str = ""
+    history: list = []
+
+class LogData(BaseModel):
+    log1: str = ""
+    log2: str = ""
+    log3: str = ""
+    log4: str = ""
 
 @dataclass
 class Errors:

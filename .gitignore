@@ -1,3 +1,4 @@
 __pycache__/
 weight/
 .vscode/
+retrieve_memory.py
