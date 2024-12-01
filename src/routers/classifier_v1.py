@@ -4,7 +4,7 @@ from asyncio import get_event_loop, Lock
 import asyncio
 from dotenv import load_dotenv
 from toolkit.method import *
-from toolkit.lib import (AnalyzeResponse, ChatResponse, LogData, InputFormat, Errors, HTTPErrorResult, catch_error, healthcheck, env_config, model_config)
+from toolkit.lib import (AnalyzeResponse, ChatResponse, LogCategoryResponse, LogData, InputFormat, Errors, HTTPErrorResult, catch_error, healthcheck, env_config, model_config)
 import concurrent.futures
 
 from ibm_watsonx_ai import APIClient
@@ -63,6 +63,24 @@ async def watsonx_generate(model_name:str = "", system_prompt:str = None, requir
     async with lock:
         analysis_result = await event_loop.run_in_executor(None, generate_text, model_name, system_prompt, require_text, model_config, env_config)
     return AnalyzeResponse(analysis=analysis_result)
+
+@router.post('/question_generate_chat', responses={
+    200: {'model': LogCategoryResponse},
+    400: {'model': HTTPErrorResult},
+    500: {'model': HTTPErrorResult},
+})
+@catch_error
+async def watsonai_question_chat(input_data:InputFormat):
+    model_name = input_data.model_name
+    require_text = input_data.require_text
+    history = input_data.history
+    
+    if model_name == "" or require_text == None or require_text == "":
+        return Errors.NO_INPUT_ERROR
+    event_loop = get_event_loop()
+    async with lock:
+        log_category_list, history = await event_loop.run_in_executor(None, question_generate_chat, model_name, require_text, history, model_config, env_config)
+    return LogCategoryResponse(log_category_list=log_category_list, history=history)
 
 @router.post('/analysis_log_chat', responses={
     200: {'model': ChatResponse},

@@ -1,41 +1,10 @@
-*** System Log ***
-
---- System Boot ---
-Date/Time: 2024-11-23 08:00:00
-System Boot Completed. OS Version: 15.2(7)E2, Model: Catalyst 2960X
-Starting system health check... OK
-
---- Interface Events ---
-Date/Time: 2024-11-23 08:01:15
-%LINK-3-UPDOWN: Interface GigabitEthernet0/1, changed state to up
-%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/1, changed state to up
-Date/Time: 2024-11-23 08:01:45
-%LINK-3-UPDOWN: Interface GigabitEthernet0/2, changed state to down
-%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/2, changed state to down
-
---- VLAN Configuration ---
-Date/Time: 2024-11-23 08:10:00
-%VLAN-1: VLAN 10 created
-%VLAN-1: VLAN 20 created
-%SPANTREE-5-ROOTCHANGE: Root changed for VLAN 10, new root port is GigabitEthernet0/1
-
---- Security Events ---
-Date/Time: 2024-11-23 08:20:35
-%SECURITY-4-PORTSECURITY: Port security violation on Interface GigabitEthernet0/1
-%SECURITY-5-CONFIGURATION: Access list ACL-101 applied to Interface GigabitEthernet0/1
-
---- System Health ---
-Date/Time: 2024-11-23 08:30:00
-%SYS-6-CPU: CPU Utilization: 45%, Memory Usage: 68%
-%SYS-4-TEMPERATURE: Temperature at normal range, Current: 45°C, Threshold: 75°C
-
---- Spanning Tree Protocol ---
-Date/Time: 2024-11-23 08:35:00
-%SPANTREE-2-BPDUFILTER: BPDU filter enabled on Interface GigabitEthernet0/2
-
---- Device Shutdown ---
-Date/Time: 2024-11-23 08:50:00
-%SYS-5-SHUTDOWN: Shutting down system
-Saving configuration... Done
-
-Switch#
+CPU utilization for five seconds: 98%/96%; one minute: 97%; five minutes: 94%
+ PID    Runtime(ms) Invoked uSecs   5Sec   1Min   5Min  TTY Process
+---------------------------------------------------------------------
+   1       123456      1234  100000   70%    68%    65%   0   IP Input
+   2       123000      1222   98000   20%    25%    22%   0   SNMP ENGINE
+   3        50000      5000   10000    5%     2%     3%   0   OSPF Router
+   4        25000      2500   10000    3%     2%     3%   0   HTTP Server
+   5        20000      2000   10000    2%     1%     1%   0   Telnet
+   6        10000      1000   10000    1%     1%     0%   0   EIGRP-IPv4
+---------------------------------------------------------------------

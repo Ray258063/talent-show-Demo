@@ -1,9 +1,10 @@
 from toolkit.lib import (model_config, env_config, LogData)
-
+from toolkit.prompt_lib import *
 from langchain_core.prompts import PromptTemplate
 from ibm_watsonx_ai.foundation_models import ModelInference
 from langchain_ibm import WatsonxLLM
 
+import re
 import pickle
 
 def generate_text(model_name: str, system_prompt: str, require_text: str, model_config: object, env_config: object) -> str:
@@ -30,100 +31,172 @@ def generate_text(model_name: str, system_prompt: str, require_text: str, model_
         print("Error", e)
         return e
 
-def generate_chat(model_name: str, require_text: str, history: list, model_config: object, env_config: object) -> str:
-    
-    system_prompt = """You are a professional network switch fault diagnosis expert and have extensive experience in analyzing network equipment problems. Your task is to carefully analyze switch logs (logs) and provide professional and accurate problem diagnosis and solution suggestions. During the analysis, follow these steps and "Analysis_principles":
-    
-    1. Carefully check the log content to identify key error messages
-    2. Conduct systemic problem analysis
-        - Determine the type of problem (hardware, software, settings, connections, etc.)
-        - Trace possible root causes
-    3. Provide specific diagnostic results
-    4. Give clear solutions or further diagnostic suggestions
-
-    <Analysis_principles>
-    - Remain objective and technically professional
-    - Prioritize the impact on network stability and security
-    - Provide implementable technical suggestions
-    </Analysis_principles>"""
+def question_generate_chat(model_name: str, require_text: str, history: list, model_config: object, env_config: object) -> str:
     
     if len(history) == 0:
-        message = [
+        require_message = [
             {
                 "role": "system",
-                "content": system_prompt
+                "content": question_prompt
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": require_text
+                    }
+                ]
             }
         ]
-        messages = message
     else:
-        messages = history
+        input_text = {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": require_text
+                }
+            ]
+        }
+        history.append(input_text)
+        require_message = history
 
     watsonx_llm = ModelInference(
         model_id=model_name,
         api_client=model_config.Client,
         project_id=env_config.watsonx_project_id,
-        messages = messages,
         params = {
-            "min_new_tokens": 1,
-            "max_new_tokens": 300,
-            "seed": 42
+            "max_tokens": 300
         }
     )
+    
     try:
-        response = watsonx_llm.generate([require_text])
-        print("生成結果:\n", response)
-        out_text = response[0]['results'][0]['generated_text']
-        history = process_history(out_text, messages)
+        response = watsonx_llm.chat(messages=require_message)
+        print("生成結果:\n", response["choices"][0]["message"]["content"])
+        history = process_history(response["choices"][0]["message"], require_message)
+        out_text = response["choices"][0]["message"]["content"]
+        match = re.search(r"<log_category>(.*?)</log_category>", out_text, re.DOTALL)
+        if match:
+            content = match.group(1).strip()
+            log_category_list = content.split("\n")
+            print(log_category_list)
+            return log_category_list, history
+        else:
+            print("未找到匹配內容。")
+            all_log_list = ["Troubleshooting messages","security incident","port state",
+            "protocol activity","Hardware and resource usage","System events","User action"]
+            return all_log_list, history
+    except Exception as e:
+        print("Error", e)
+        return e
+
+def generate_chat(model_name: str, require_text: str, history: list, model_config: object, env_config: object) -> str:
+    
+    if len(history) == 0:
+        require_message = [
+            {
+                "role": "system",
+                "content": first_cpu_prompt
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": require_text + first_cpu_reply
+                    }
+                ]
+            }
+        ]
+    else:
+        input_text = {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": require_text
+                }
+            ]
+        }
+        history.append(input_text)
+        require_message = history
+
+    watsonx_llm = ModelInference(
+        model_id=model_name,
+        api_client=model_config.Client,
+        project_id=env_config.watsonx_project_id,
+        params = {
+            "max_tokens": 300
+        }
+    )
+    
+    try:
+        response = watsonx_llm.chat(messages=require_message)
+        print("生成結果:\n", response["choices"][0]["message"]["content"])
+        out_text = response["choices"][0]["message"]["content"]
+        history = process_history(response["choices"][0]["message"], require_message)
         return out_text, history
     except Exception as e:
         print("Error", e)
         return e
 
 def process_history(generate_text, history):
-    new_text = {
-      "role": "assistant",
-      "content": generate_text
-    }
-    history.append(new_text)
+    history.append(generate_text)
     return history
 
 def generate_rag_chat(log_data:LogData, model_name: str, require_text: str, history: list, model_config: object, env_config: object) -> str:
-    system_prompt = """Analyze the content from the input log information and detect error messages, resource overload and system anomalies.\n"""
     
+    # with open('vector_store.pkl', 'rb') as f:
+    #     loaded_vectorstore = pickle.load(f)
+    # retriever = loaded_vectorstore.as_retriever()
+    # relevant_documents = retriever.invoke("程式語言")
+
+    # require_text = process_require_text(log_data, relevant_documents, require_text)
+
     if len(history) == 0:
-        message = [
+        require_message = [
             {
                 "role": "system",
-                "content": system_prompt
+                "content": second_cpu_prompt
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": require_text + second_cpu_reply
+                    }
+                ]
             }
         ]
-        messages = message
     else:
-        messages = history
+        input_text = {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": require_text
+                }
+            ]
+        }
+        history.append(input_text)
+        require_message = history
 
     watsonx_llm = ModelInference(
         model_id=model_name,
         api_client=model_config.Client,
         project_id=env_config.watsonx_project_id,
-        messages = messages,
         params = {
-            "min_new_tokens": 1,
-            "max_new_tokens": 300,
-            "seed": 42
+            "max_tokens": 500
         }
     )
-
-    with open('vector_store.pkl', 'rb') as f:
-        loaded_vectorstore = pickle.load(f)
-    retriever = loaded_vectorstore.as_retriever()
-    relevant_documents = retriever.invoke("程式語言")
-
-    require_text = process_require_text(log_data, relevant_documents, require_text)
+    
     try:
-        response = watsonx_llm.generate([require_text])
-        print("生成結果:\n", response)
-        out_text = response[0]['results'][0]['generated_text']
-        history = process_history(out_text, messages)
+        response = watsonx_llm.chat(messages=require_message)
+        print("生成結果:\n", response["choices"][0]["message"]["content"])
+        out_text = response["choices"][0]["message"]["content"]
+        history = process_history(response["choices"][0]["message"], require_message)
         return out_text, history
     except Exception as e:
         print("Error", e)
