@@ -1,0 +1,25 @@
+idx   sess           user@line      Logged command
+  301     1           admin@vty0     |  configure terminal
+  302     1           admin@vty0     |  interface gigabitEthernet0/3
+  303     1           admin@vty0     |  no description
+  304     2           user1@vty1     |  configure terminal
+  305     2           user1@vty1     |  vlan 999
+  306     2           user1@vty1     |  name TestVLAN
+  307     3           user2@vty2     |  configure terminal
+  308     3           user2@vty2     |  ip route 0.0.0.0 0.0.0.0 10.0.0.254
+  309     3           user2@vty2     |  ip route 192.168.100.0 255.255.255.0 10.0.0.253
+  310     3           user2@vty2     |  exit
+  311     4           user3@vty3     |  show running-config
+  312     4           user3@vty3     |  configure terminal
+  313     4           user3@vty3     |  banner motd ^C Unauthorized Access Prohibited ^C
+  314     5           admin@vty0     |  configure terminal
+  315     5           admin@vty0     |  logging synchronous
+  316     5           admin@vty0     |  exit
+  317     6           user4@vty4     |  configure terminal
+  318     6           user4@vty4     |  interface vlan999
+  319     6           user4@vty4     |  ip address 192.168.1.1 255.255.255.0
+  320     6           user4@vty4     |  exit
+  321     7           user5@vty5     |  configure terminal
+  322     7           user5@vty5     |  service password-encryption
+  323     7           user5@vty5     |  exit
+  324     7           user5@vty5     |  reload

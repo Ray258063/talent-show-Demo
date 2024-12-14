@@ -1,0 +1,22 @@
+【Exception Summary】
+1. CPU 使用率異常高，可能導致系統性能下降
+2. 設定了未知 VLAN（VLAN 999）和未知 IP 地址（192.168.1.1）
+【Detailed Analysis】
+1. Question type: CPU 使用率異常
+    - 可能原因：
+        * IP Input 進程占用 CPU 時間過長
+        * SNMP ENGINE 和 OSPF Router 進程也占用了較多的 CPU 時間
+    - 潛在影響：
+        * 系統性能下降，可能導致服務不可用
+        * 可能影響其他進程的執行效率
+2. Question type: 未知 VLAN 設定
+    - 可能原因：
+        * 使用者 user1 和 user4 設定了未知 VLAN（VLAN 999）
+        * 未知 VLAN 可能是用於非法或未授權的目的
+    - 潛在影響：
+        * 可能導致網路安全漏洞
+        * 可能影響網路的可靠性和穩定性
+3. Question type: 未知 IP 地址設定
+    - 可能原因：
+        * 使用者 user2 設定了未知 IP 地址（192.168.1.1）
+        * 改變靜態路由可能對網絡流量造成重大影響，例如改變默認路由或干擾既有的路由表

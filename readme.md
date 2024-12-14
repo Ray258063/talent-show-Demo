@@ -5,15 +5,22 @@
 - 第三個有RAG 但資料目前開發中 聊天模式還需構想
 
 # Set Up
-## 1. Install Dependency
+## Local
+### 1. Install Dependency
 ```bash
 pip install --no-cache-dir -r requirements.txt
 ```
 
-## 2. Start Fast API
+### 2. Start Fast API
 ```bash
 cd src/
 uvicorn main:app --reload
+```
+
+## Docker
+```bash
+docker build -t talent-show:latest .
+docker run -p 8000:8000 talent-show:latest
 ```
 
 # Talent Analyze log API

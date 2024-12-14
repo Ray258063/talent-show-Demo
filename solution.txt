@@ -1,6 +1,0 @@
-停用http指令
-Switch# no ip http server
-Switch# no ip http secure-server
-停用telnet服務
-Switch# line vty 0 4
-Switch# transport input none
