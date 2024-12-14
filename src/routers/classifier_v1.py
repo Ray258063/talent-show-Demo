@@ -4,7 +4,7 @@ from asyncio import get_event_loop, Lock
 import asyncio
 from dotenv import load_dotenv
 from toolkit.method import *
-from toolkit.lib import (AnalyzeResponse, ChatResponse, LogCategoryResponse, LogData, InputFormat, Errors, HTTPErrorResult, catch_error, healthcheck, env_config, model_config)
+from toolkit.lib import (AnalyzeResponse, ChatResponse, LogCategoryResponse, InputFormat, SolutionResponse, Errors, HTTPErrorResult, catch_error, healthcheck, env_config, model_config)
 import concurrent.futures
 
 from ibm_watsonx_ai import APIClient
@@ -97,7 +97,7 @@ async def watsonai_chat(input_data:InputFormat):
         return Errors.NO_INPUT_ERROR
     event_loop = get_event_loop()
     async with lock:
-        analysis_chat_result, history = await event_loop.run_in_executor(None, generate_chat, model_name, require_text, history, model_config, env_config)
+        analysis_chat_result, history = await event_loop.run_in_executor(None, analysis_generate_chat, model_name, require_text, history, model_config, env_config)
     return ChatResponse(analysis=analysis_chat_result, history=history)
 
 @router.post('/rag_log_chat', responses={
@@ -106,7 +106,7 @@ async def watsonai_chat(input_data:InputFormat):
     500: {'model': HTTPErrorResult},
 })
 @catch_error
-async def watsonai_rag_chat(log_data:LogData, input_data:InputFormat):
+async def watsonai_rag_chat(input_data:InputFormat):
     model_name = input_data.model_name
     require_text = input_data.require_text
     history = input_data.history
@@ -115,5 +115,5 @@ async def watsonai_rag_chat(log_data:LogData, input_data:InputFormat):
         return Errors.NO_INPUT_ERROR
     event_loop = get_event_loop()
     async with lock:
-        analysis_chat_result, history = await event_loop.run_in_executor(None, generate_rag_chat, log_data, model_name, require_text, history, model_config, env_config)
-    return ChatResponse(analysis=analysis_chat_result, history=history)
+        analysis_chat_result, history, command_suggestion = await event_loop.run_in_executor(None, generate_rag_chat, model_name, require_text, history, model_config, env_config)
+    return ChatResponse(analysis=analysis_chat_result, commands=command_suggestion, history=history)

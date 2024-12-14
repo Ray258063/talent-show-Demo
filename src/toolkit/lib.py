@@ -45,11 +45,10 @@ class InputFormat(BaseModel):
     require_text: str = ""
     history: list = []
 
-class LogData(BaseModel):
-    log1: str = ""
-    log2: str = ""
-    log3: str = ""
-    log4: str = ""
+class SolutionResponse(BaseModel):
+    analysis: str
+    commands: list[dict]
+    history: list = []
 
 @dataclass
 class Errors:

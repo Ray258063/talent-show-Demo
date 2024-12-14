@@ -107,10 +107,10 @@ Reply_rule = """<Reply_rule>
         - immediate actions:
         - further investigation:
 
-    [Diagnostic command suggestions]
+    【Diagnostic command suggestions】
         - Recommended diagnostic instructions:
 
-    [Additional explanation]
+    【Additional explanation】
         - Other technical details that need attention
 </Output example>
 Provide analysis results based on "log_data" and "User_question" and follow "Reply_rule" to return them in the "Output example" format."""
@@ -140,28 +140,26 @@ cpu_reply_rule = """<Reply_rule>
         - immediate actions:
         - further investigation:
 
-    [Command suggestions]
+    【Command suggestions】
         - Recommended commands:
         (View or disable process commands, the more the better)
 
-    [Additional explanation]
+    【Additional explanation】
         - Other technical details that need attention
 </Output example>
 Provide analysis results based on "log_data" and "User_question" and follow "Reply_rule" to return them in the "Output example" format."""
 
 first_cpu_prompt = """Your task is to act as a professional CPU performance diagnostic expert and conduct in-depth technical analysis of the provided CPU usage logs based on "Analysis_principles". The analysis process is as follows:
 
-Detailed check of logs
- 
-Comprehensive view of CPU usage data
-Identify abnormally high load processes
-Analyze CPU usage trends in different time periods
+1. Detailed check of logs
+    - Comprehensive view of CPU usage data
+    - Identify abnormally high load processes
+    - Analyze CPU usage trends in different time periods
 
-Systemic problem analysis
- 
-Determine the type of problem (hardware performance, software load, network traffic, etc.)
-Tracing possible root causes of high load processes
-Evaluate the impact of each process on system performance
+2. Systemic problem analysis
+    - Determine the type of problem (hardware performance, software load, network traffic, etc.)    
+    - Tracing possible root causes of high load processes
+    - Evaluate the impact of each process on system performance
 
 <Analysis_principles>
     - Maintain technical objectivity
@@ -177,22 +175,22 @@ The output contains:
 first_cpu_reply = """<Reply_rule>
     - If there are no exceptions in the log, reply "No problem detected"
     - Technical terms need to be explained simply
-    - Recommendations are specific and actionable
+    - Strictly adhere to the "Output_format" format
     - Do not include other content
     - Answer in Traditional Chinese
 </Reply_rule>
 
-<Output example>
+<Output_format>
     【Exception summary】
         - A concise description of the main issues detected
     【Detailed analysis】
         - Question type:
         - Possible reasons:
         - Potential impact:
-</Output example>
-Provide analysis results based on "log_data" and follow "Reply_rule" to return them in the "Output example" format."""
+</Output_format>
+Provide analysis results based on "log_data" and follow "Reply_rule" to return them in the "Output_format" format."""
 
-second_cpu_prompt = """Your task is to act as a professional CPU performance diagnostic expert and conduct in-depth technical analysis of the provided CPU usage logs based on "Analysis_principles". The analysis process is as follows:
+second_cpu_prompt = """Your task is to act as a professional CPU performance diagnostic expert and conduct in-depth technical analysis of the provided CPU usage logs based on "diagnostic_principles" and then provide diagnostic reports and solutions. The diagnostic process is as follows:
 
 1. Professional diagnostic report
     - Pinpoint high-load processes
@@ -204,12 +202,12 @@ second_cpu_prompt = """Your task is to act as a professional CPU performance dia
     - Identify processes that can be optimized or deactivated
     - Provide specific technical advice to reduce CPU load
 
-<Analysis_principles>
+<diagnostic_principles>
     - Maintain technical objectivity
     - Prioritize system stability and security
     - Provide implementable and precise technical advice
     - A data-driven approach to diagnosis
-<Analysis_principles>
+<diagnostic_principles>
 
 The output contains:
     1. Specific optimization suggestions
@@ -220,11 +218,12 @@ second_cpu_reply = """<Reply_rule>
     - Technical terms need to be explained simply
     - Recommendations are specific and actionable
     - Do not include other content
+    - Strictly adhere to the "Output_format" format
     - Provide short description in 300 words
     - Answer in Traditional Chinese
 </Reply_rule>
 
-<Output example>
+<Output_format>
     【Suggested solution】
         - Process classification: (just list processes name, do not description)
             - Core processes:
@@ -232,8 +231,172 @@ second_cpu_reply = """<Reply_rule>
         - immediate actions:
         - further investigation:
 
-    [Command suggestions]
+    【Command suggestions】
         - Recommended commands:
         (View or disable process commands, the more the better)
-</Output example>
-Provide analysis results based on "log_data" and follow "Reply_rule" to return them in the "Output example" format."""
+
+    【Additional explanation】
+        - Other technical details that need attention
+</Output_format>
+Provide analysis results based on "log_data" and follow "Reply_rule" to return them in the "Output_format" format."""
+
+first_general_prompt = """Objective:
+Perform a comprehensive security and performance analysis of the provided log files. Carefully examine the logs from different sources, identifying potential security risks, performance issues, and unusual user activities.
+
+Input format:
+Multiple log files will be provided, each labeled with a log type label.
+
+Analysis Requirements:
+1. Detect and categorize system anomalies
+2. Identify potential security risks
+3. Analyze performance bottlenecks
+4. Highlight abnormal user behavior
+
+Detailed Analysis Criteria:
+A. Performance Anomalies
+- Check CPU utilization and process load
+- Identify high-resource consuming processes
+- Assess potential system performance degradation
+
+B. Security Risks
+- Review user connection details
+- Analyze configuration changes
+- Detect potentially malicious network configurations
+- Examine unauthorized or suspicious user actions
+
+C. Network Configuration Risks
+- Validate routing configurations, paying special attention to whether static routes are inconsistent with best practices
+- Check for potentially dangerous network settings
+- Identify misconfigurations that may have potential risks and contradictions
+
+Expected Output Format:
+【Exception Summary】
+    1. Brief description of first detected issue
+    2. Brief description of second detected issue
+
+【Detailed Analysis】
+    1. Question type: [Specific issue type]
+        - Possible reasons:
+            * Detailed explanation of potential causes
+        - Potential impact:
+            * Comprehensive assessment of risks
+    
+
+Specific Focus Areas:
+- Unusual CPU load distribution, distinguishing between critical processes and deactivable processes
+- Suspicious network routing configurations
+- Unexpected VLAN or interface modifications
+- Evaluate the legality and safety of user behavior
+
+Reporting Guidelines:
+- Be precise and objective
+- Provide evidence from log files
+- Prioritize findings based on severity
+- Strictly adhere to the "Output_format" format
+- Do not include other content
+- Answer in Traditional Chinese
+
+Approach:
+- Cross-reference logs from different sources
+- Look for correlations and patterns
+- Consider both technical and potential human factors
+
+Highlight any findings that suggest:
+- Performance bottlenecks
+- Security vulnerabilities
+- Potential insider threats
+- Configuration mistakes"""
+
+second_general_prompt = """Objective:
+Based on the detailed anomaly analysis, generate a comprehensive solution report that:
+- Prioritizes system stability and security
+- Provides precise, actionable technical recommendations
+- Offers step-by-step mitigation strategies
+
+Input:
+- Detailed anomaly analysis report
+- Identified system vulnerabilities
+- Performance and security issues
+
+Solution Report Generation Guidelines:
+
+I. Solution Development Approach
+1. Prioritize solutions based on:
+   - Immediate security risks
+   - System performance impact
+   - Potential for service disruption
+2. Develop multi-layered mitigation strategies
+3. Provide both immediate and long-term solutions
+
+II. Solution Criteria
+A. Technical Precision
+   - Specific, executable commands
+   - Clear step-by-step implementation process
+   - Minimal system disruption
+
+B. Risk Mitigation
+   - Address root causes of identified issues
+   - Prevent potential future occurrences
+   - Enhance overall system security and performance
+
+III. Recommended Solution Structure
+【Suggested Solution】
+1. [Issue Type]: 
+   - Root cause analysis
+   - Immediate mitigation steps
+   - Long-term prevention strategy
+
+2. [Issue Type]:
+   - Detailed investigation approach
+   - Specific remediation actions
+   - Monitoring and verification methods
+
+【Command Suggestions】
+- Precise, executable commands
+- Context-specific configuration changes
+- Verification commands to confirm resolution
+
+IV. Additional Considerations
+- Provide alternative solutions if primary approach is not feasible
+- Include potential impact of each solution
+- Recommend post-implementation monitoring
+
+V. Reporting Principles
+- Be concise and actionable
+- Use clear, technical language
+- Avoid unnecessary technical jargon
+- Explain rationale behind each recommendation
+- Strictly adhere to the "Output_format" format
+- Do not include other content
+- Answer in Traditional Chinese
+- Provide short description in 500 words
+
+VI. Solution Validation Checklist
+1. Verify solution addresses root cause
+2. Assess potential side effects
+3. Confirm minimal service interruption
+4. Validate configuration changes
+5. Recommend ongoing monitoring
+
+Solution Output Requirements:
+- Structured, easy-to-follow format
+- Executable commands in <command tags>
+- Clear explanation of each step
+- Potential risks and mitigation strategies
+
+Special Instructions:
+- Cross-reference multiple log sources
+- Consider interdependencies between systems
+- Prioritize solutions that enhance both performance and security
+
+Reporting Format:
+【Suggested Solution】
+1. Detailed problem description
+   - Root cause
+   - Mitigation approach
+   - Expected outcome
+
+【Command Suggestions】
+- Specific, context-aware commands
+- Verification steps
+- Configuration rollback procedures if needed"""

@@ -1,10 +1,11 @@
-from toolkit.lib import (model_config, env_config, LogData)
+from toolkit.lib import (model_config, env_config)
 from toolkit.prompt_lib import *
 from langchain_core.prompts import PromptTemplate
 from ibm_watsonx_ai.foundation_models import ModelInference
 from langchain_ibm import WatsonxLLM
 
 import re
+from collections import defaultdict
 import pickle
 
 def generate_text(model_name: str, system_prompt: str, require_text: str, model_config: object, env_config: object) -> str:
@@ -22,7 +23,6 @@ def generate_text(model_name: str, system_prompt: str, require_text: str, model_
         }
     )
     try:
-        # PromptTemplate.from_template(system_prompt)
         response = watsonx_llm.generate([system_prompt + require_text])
         print("生成結果:\n", response)
         out_text = response[0]['results'][0]['generated_text']
@@ -91,20 +91,20 @@ def question_generate_chat(model_name: str, require_text: str, history: list, mo
         print("Error", e)
         return e
 
-def generate_chat(model_name: str, require_text: str, history: list, model_config: object, env_config: object) -> str:
+def analysis_generate_chat(model_name: str, require_text: str, history: list, model_config: object, env_config: object) -> str:
     
     if len(history) == 0:
         require_message = [
             {
                 "role": "system",
-                "content": first_cpu_prompt
+                "content": first_general_prompt
             },
             {
                 "role": "user",
                 "content": [
                     {
                         "type": "text",
-                        "text": require_text + first_cpu_reply
+                        "text": require_text
                     }
                 ]
             }
@@ -127,7 +127,7 @@ def generate_chat(model_name: str, require_text: str, history: list, model_confi
         api_client=model_config.Client,
         project_id=env_config.watsonx_project_id,
         params = {
-            "max_tokens": 300
+            "max_tokens": 800
         }
     )
     
@@ -145,7 +145,7 @@ def process_history(generate_text, history):
     history.append(generate_text)
     return history
 
-def generate_rag_chat(log_data:LogData, model_name: str, require_text: str, history: list, model_config: object, env_config: object) -> str:
+def generate_rag_chat(model_name: str, require_text: str, history: list, model_config: object, env_config: object) -> str:
     
     # with open('vector_store.pkl', 'rb') as f:
     #     loaded_vectorstore = pickle.load(f)
@@ -158,14 +158,14 @@ def generate_rag_chat(log_data:LogData, model_name: str, require_text: str, hist
         require_message = [
             {
                 "role": "system",
-                "content": second_cpu_prompt
+                "content": second_general_prompt
             },
             {
                 "role": "user",
                 "content": [
                     {
                         "type": "text",
-                        "text": require_text + second_cpu_reply
+                        "text": require_text
                     }
                 ]
             }
@@ -188,7 +188,7 @@ def generate_rag_chat(log_data:LogData, model_name: str, require_text: str, hist
         api_client=model_config.Client,
         project_id=env_config.watsonx_project_id,
         params = {
-            "max_tokens": 500
+            "max_tokens": 800
         }
     )
     
@@ -197,7 +197,8 @@ def generate_rag_chat(log_data:LogData, model_name: str, require_text: str, hist
         print("生成結果:\n", response["choices"][0]["message"]["content"])
         out_text = response["choices"][0]["message"]["content"]
         history = process_history(response["choices"][0]["message"], require_message)
-        return out_text, history
+        command_suggestion = get_command_suggestion(out_text)
+        return out_text, history, command_suggestion
     except Exception as e:
         print("Error", e)
         return e
@@ -210,3 +211,38 @@ def process_require_text(log_data, relevant_documents, require_text):
     """
     input_solution = ""
     return input_log + require_text
+
+def get_command_suggestion(generate_text):
+    command_suggestion = re.search(r"【Command suggestions】(.*?)【Additional explanation】", generate_text, re.DOTALL)
+    if command_suggestion:
+        content = command_suggestion.group(1).strip()
+        print(content)
+    else:
+        print("未找到匹配內容。")
+
+def extract_commands(text):
+    # 提取所有 <command>...</command> 的內容
+    commands = re.findall(r"<command>(.*?)</command>", text)
+
+    # 移除 "Switch#" 並分區塊處理
+    blocks = defaultdict(list)
+
+    # 依據段落標題分區塊
+    current_block = ""
+    for line in text.splitlines():
+        # 檢查是否是新段落的標題
+        match = re.match(r"^\d+\.\s+(.*)$", line)
+        if match:
+            current_block = match.group(1)
+
+        # 如果是 <command>，處理後加入當前區塊
+        for command in re.findall(r"<command>(.*?)</command>", line):
+            cleaned_command = command.replace("Switch#", "").strip()
+            blocks[current_block].append(cleaned_command)
+
+    # 整理輸出格式
+    result = []
+    for block, cmds in blocks.items():
+        result.append({"title": block, "code": cmds})
+
+    return result
