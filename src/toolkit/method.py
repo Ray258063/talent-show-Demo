@@ -197,7 +197,7 @@ def generate_rag_chat(model_name: str, require_text: str, history: list, model_c
         print("生成結果:\n", response["choices"][0]["message"]["content"])
         out_text = response["choices"][0]["message"]["content"]
         history = process_history(response["choices"][0]["message"], require_message)
-        command_suggestion = get_command_suggestion(out_text)
+        command_suggestion = extract_commands(out_text)
         return out_text, history, command_suggestion
     except Exception as e:
         print("Error", e)
@@ -211,14 +211,6 @@ def process_require_text(log_data, relevant_documents, require_text):
     """
     input_solution = ""
     return input_log + require_text
-
-def get_command_suggestion(generate_text):
-    command_suggestion = re.search(r"【Command suggestions】(.*?)【Additional explanation】", generate_text, re.DOTALL)
-    if command_suggestion:
-        content = command_suggestion.group(1).strip()
-        print(content)
-    else:
-        print("未找到匹配內容。")
 
 def extract_commands(text):
     # 提取所有 <command>...</command> 的內容

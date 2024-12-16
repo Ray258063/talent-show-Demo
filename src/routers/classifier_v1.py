@@ -101,7 +101,7 @@ async def watsonai_chat(input_data:InputFormat):
     return ChatResponse(analysis=analysis_chat_result, history=history)
 
 @router.post('/rag_log_chat', responses={
-    200: {'model': ChatResponse},
+    200: {'model': SolutionResponse},
     400: {'model': HTTPErrorResult},
     500: {'model': HTTPErrorResult},
 })
@@ -116,4 +116,4 @@ async def watsonai_rag_chat(input_data:InputFormat):
     event_loop = get_event_loop()
     async with lock:
         analysis_chat_result, history, command_suggestion = await event_loop.run_in_executor(None, generate_rag_chat, model_name, require_text, history, model_config, env_config)
-    return ChatResponse(analysis=analysis_chat_result, commands=command_suggestion, history=history)
+    return SolutionResponse(analysis=analysis_chat_result, commands=command_suggestion, history=history)

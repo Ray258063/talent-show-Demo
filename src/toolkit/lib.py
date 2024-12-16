@@ -32,6 +32,7 @@ class HTTPErrorResult(BaseModel):
 
 class AnalyzeResponse(BaseModel):
     analysis: str
+    
 class LogCategoryResponse(BaseModel):
     log_category_list: list
     history: list

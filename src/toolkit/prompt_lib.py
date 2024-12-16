@@ -294,7 +294,7 @@ Reporting Guidelines:
 - Prioritize findings based on severity
 - Strictly adhere to the "Output_format" format
 - Do not include other content
-- Answer in Traditional Chinese
+- Must answer in Traditional Chinese
 
 Approach:
 - Cross-reference logs from different sources
@@ -355,6 +355,7 @@ III. Recommended Solution Structure
 - Precise, executable commands
 - Context-specific configuration changes
 - Verification commands to confirm resolution
+- Configuration rollback procedures if needed
 
 IV. Additional Considerations
 - Provide alternative solutions if primary approach is not feasible
@@ -368,8 +369,9 @@ V. Reporting Principles
 - Explain rationale behind each recommendation
 - Strictly adhere to the "Output_format" format
 - Do not include other content
-- Answer in Traditional Chinese
+- Must answer in Traditional Chinese
 - Provide short description in 500 words
+- Do not provide conclusions
 
 VI. Solution Validation Checklist
 1. Verify solution addresses root cause
@@ -380,7 +382,7 @@ VI. Solution Validation Checklist
 
 Solution Output Requirements:
 - Structured, easy-to-follow format
-- Executable commands in <command tags>
+- Executable commands package in <command> tags
 - Clear explanation of each step
 - Potential risks and mitigation strategies
 
@@ -393,10 +395,4 @@ Reporting Format:
 【Suggested Solution】
 1. Detailed problem description
    - Root cause
-   - Mitigation approach
-   - Expected outcome
-
-【Command Suggestions】
-- Specific, context-aware commands
-- Verification steps
-- Configuration rollback procedures if needed"""
+   - Mitigation approach"""
