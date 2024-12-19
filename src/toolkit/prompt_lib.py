@@ -317,6 +317,7 @@ Input:
 - Detailed anomaly analysis report
 - Identified system vulnerabilities
 - Performance and security issues
+- Related solutions
 
 Solution Report Generation Guidelines:
 
@@ -345,17 +346,14 @@ III. Recommended Solution Structure
    - Root cause analysis
    - Immediate mitigation steps
    - Long-term prevention strategy
-
-2. [Issue Type]:
    - Detailed investigation approach
    - Specific remediation actions
-   - Monitoring and verification methods
 
-【Command Suggestions】
-- Precise, executable commands
-- Context-specific configuration changes
-- Verification commands to confirm resolution
-- Configuration rollback procedures if needed
+2. [Command Suggestions]
+    - Precise, executable commands
+    - Context-specific configuration changes
+    - Verification commands to confirm resolution
+    - Configuration rollback procedures if needed
 
 IV. Additional Considerations
 - Provide alternative solutions if primary approach is not feasible
@@ -382,7 +380,7 @@ VI. Solution Validation Checklist
 
 Solution Output Requirements:
 - Structured, easy-to-follow format
-- Executable commands package in <command> tags
+- Executable commands within <command> tags
 - Clear explanation of each step
 - Potential risks and mitigation strategies
 
@@ -393,6 +391,6 @@ Special Instructions:
 
 Reporting Format:
 【Suggested Solution】
-1. Detailed problem description
+   - Detailed problem description
    - Root cause
-   - Mitigation approach"""
+   - Step-by-step mitigation approach, with commands wrapped in <command> tags"""

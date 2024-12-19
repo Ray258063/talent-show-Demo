@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, Response, status, Request, HTTPException
 from asyncio import get_event_loop, Lock
 import asyncio
 from dotenv import load_dotenv
@@ -9,6 +9,9 @@ import concurrent.futures
 
 from ibm_watsonx_ai import APIClient
 from ibm_watsonx_ai import Credentials
+
+from linebot import LineBotApi
+from linebot.models import TextSendMessage, Event
 
 if __name__ == 'routers.classifier_v1':
     TAG_MODEL_VERSION = 'v1'
@@ -31,6 +34,7 @@ async def startup():
             api_key = env_config.WATSONX_API_KEY,
         )
         model_config.Client = APIClient(credentials)
+        model_config.line_bot_api = LineBotApi(os.environ['LINE_CHANNEL_ACCESS_TOKEN'])
 
         healthcheck.get_env = True
     except:
@@ -117,3 +121,34 @@ async def watsonai_rag_chat(input_data:InputFormat):
     async with lock:
         analysis_chat_result, history, command_suggestion = await event_loop.run_in_executor(None, generate_rag_chat, model_name, require_text, history, model_config, env_config)
     return SolutionResponse(analysis=analysis_chat_result, commands=command_suggestion, history=history)
+
+# 需要改上面api url 因為/callback前不得有任何字元 懶得改 還要用ngrok再去改line帳戶裡的webhook網址
+@router.post("/callback")
+async def callback(request: Request):
+    # 取得 LINE Webhook 的簽名
+    signature = request.headers.get("X-Line-Signature", "")
+    body = await request.body()
+
+    try:
+        # 將收到的事件解析為 JSON
+        events = json.loads(body.decode("utf-8")).get("events", [])
+        for event in events:
+            # 只處理 MessageEvent 且訊息為文字的事件
+            if event.get("type") == "message" and event["message"]["type"] == "text":
+                reply_token = event["replyToken"]
+                user_message = event["message"]["text"]
+                reply_message = f"您說的是：{user_message}"
+                model_config.line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_message))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+    return "OK"
+
+@router.post("/broadcast")
+async def broadcast_message(broadcast_message: str):
+    # 廣播訊息給所有好友
+    try:
+        model_config.line_bot_api.broadcast(TextSendMessage(text=broadcast_message.message))
+        return {"message": "廣播訊息已發送成功"}
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

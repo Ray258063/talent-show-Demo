@@ -26,6 +26,7 @@ class model_config(BaseModel):
     DEVICE: str = ''
     DEVICE_LIST: list = []
     Client: object
+    line_bot_api: object
 
 class HTTPErrorResult(BaseModel):
     result: int
